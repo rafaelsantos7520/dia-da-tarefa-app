@@ -4,7 +4,7 @@ import { TaskProvider } from '@/context/TaskContext';
 import TaskList from '@/components/TaskList';
 import TaskForm from '@/components/TaskForm';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, Plus } from 'lucide-react';
+import { CalendarDays, Plus, Users } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -27,9 +27,9 @@ const Index = () => {
         
         <main>
           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">Tarefas por dia da semana</h2>
+            <h2 className="text-xl font-semibold mb-2">Organização de tarefas rotativas</h2>
             <p className="text-muted-foreground mb-4">
-              Veja quem é responsável por cada tarefa durante a semana.
+              Veja quem é responsável por cada tarefa durante a semana, com rotação automática entre os participantes.
             </p>
           </div>
           

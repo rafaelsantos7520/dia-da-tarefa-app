@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { CalendarDays, PlusCircle, X } from 'lucide-react';
+import { CalendarDays, PlusCircle, X, Users, Plus, UserPlus } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -29,10 +29,25 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
   
   const [title, setTitle] = useState(editTask?.title || '');
   const [description, setDescription] = useState(editTask?.description || '');
-  const [assignee, setAssignee] = useState(editTask?.assignee || '');
+  const [currentAssignee, setCurrentAssignee] = useState('');
+  const [assignees, setAssignees] = useState<string[]>(editTask?.assignees || []);
   const [selectedWeekdays, setSelectedWeekdays] = useState<Weekday[]>(
     editTask?.weekdays || []
   );
+
+  const handleAddAssignee = () => {
+    if (!currentAssignee.trim()) {
+      toast.error('Digite o nome do responsável');
+      return;
+    }
+    
+    setAssignees(prev => [...prev, currentAssignee.trim()]);
+    setCurrentAssignee('');
+  };
+
+  const handleRemoveAssignee = (index: number) => {
+    setAssignees(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,8 +57,8 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
       return;
     }
     
-    if (!assignee.trim()) {
-      toast.error('Por favor, adicione um responsável pela tarefa');
+    if (assignees.length === 0) {
+      toast.error('Por favor, adicione pelo menos um responsável pela tarefa');
       return;
     }
     
@@ -55,7 +70,7 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
     const taskData = {
       title: title.trim(),
       description: description.trim(),
-      assignee: assignee.trim(),
+      assignees: assignees,
       weekdays: selectedWeekdays,
     };
 
@@ -74,7 +89,8 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
     if (!editTask) {
       setTitle('');
       setDescription('');
-      setAssignee('');
+      setAssignees([]);
+      setCurrentAssignee('');
       setSelectedWeekdays([]);
     }
   };
@@ -89,22 +105,63 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Ex: Tirar o lixo"
+          placeholder="Ex: Pagar a coca"
           className="w-full"
         />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="assignee" className="text-sm font-medium">
-          Responsável
-        </label>
-        <Input
-          id="assignee"
-          value={assignee}
-          onChange={(e) => setAssignee(e.target.value)}
-          placeholder="Quem vai realizar esta tarefa?"
-          className="w-full"
-        />
+        <div className="flex items-center gap-2 mb-2">
+          <Users className="h-4 w-4" />
+          <label className="text-sm font-medium">Responsáveis (rotação)</label>
+        </div>
+        
+        <div className="flex items-center gap-2 mb-2">
+          <Input
+            value={currentAssignee}
+            onChange={(e) => setCurrentAssignee(e.target.value)}
+            placeholder="Digite um nome e adicione"
+            className="flex-1"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAddAssignee();
+              }
+            }}
+          />
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={handleAddAssignee}
+            size="icon"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        {assignees.length > 0 ? (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {assignees.map((assignee, index) => (
+              <div 
+                key={index} 
+                className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full flex items-center gap-1"
+              >
+                <span>{assignee}</span>
+                <button 
+                  type="button" 
+                  onClick={() => handleRemoveAssignee(index)}
+                  className="h-4 w-4 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground italic">
+            Adicione pessoas para criar a rotação
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">

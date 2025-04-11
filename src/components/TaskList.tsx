@@ -24,7 +24,7 @@ const TaskList = () => {
         <CalendarDays className="mx-auto h-12 w-12 text-muted-foreground/50" />
         <h3 className="mt-4 text-lg font-medium">Nenhuma tarefa ainda</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Adicione sua primeira tarefa para começar a organizar as responsabilidades.
+          Adicione sua primeira tarefa para começar a organizar as rotações.
         </p>
       </div>
     );
@@ -49,6 +49,10 @@ const TaskList = () => {
         
         return (
           <TabsContent key={day.value} value={day.value} className="mt-0">
+            <h3 className="text-lg font-medium mb-4">
+              De quem é a responsabilidade {day.label.toLowerCase()}?
+            </h3>
+            
             {weekdayTasks.length === 0 ? (
               <div className="py-8 text-center">
                 <p className="text-sm text-muted-foreground">

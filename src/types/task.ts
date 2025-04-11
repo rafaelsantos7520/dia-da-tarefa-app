@@ -5,7 +5,7 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  assignee: string;
+  assignees: string[]; // Changed from single assignee to array of assignees
   weekdays: Weekday[];
   createdAt: string;
 }
@@ -28,4 +28,13 @@ export const getWeekdayColor = (weekday: Weekday): string => {
 export const getWeekdayLabel = (weekday: Weekday): string => {
   const option = weekdayOptions.find(opt => opt.value === weekday);
   return option ? option.label : weekday;
+};
+
+// Helper to get which person is responsible for a task on a given weekday
+export const getAssigneeForWeekday = (task: Task, weekday: Weekday): string => {
+  const weekdayIndex = task.weekdays.indexOf(weekday);
+  if (weekdayIndex === -1) return '';
+  
+  // Rotate through assignees based on the weekday's position
+  return task.assignees[weekdayIndex % task.assignees.length];
 };

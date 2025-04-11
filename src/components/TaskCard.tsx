@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Task, getWeekdayLabel, getWeekdayColor } from '@/types/task';
+import { Task, Weekday, getWeekdayLabel, getWeekdayColor, getAssigneeForWeekday } from '@/types/task';
 import { useTaskContext } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
 import { 
@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Edit, Trash2, User } from 'lucide-react';
+import { Edit, Trash2, User, Users, Calendar } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
@@ -34,6 +34,10 @@ interface TaskCardProps {
 const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
   const { deleteTask } = useTaskContext();
   const [isEditing, setIsEditing] = useState(false);
+
+  // Get the current weekday's assignee
+  const currentAssignee = highlightWeekday ? 
+    getAssigneeForWeekday(task, highlightWeekday as Weekday) : '';
 
   return (
     <Card className="w-full h-full">
@@ -90,9 +94,20 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
               </div>
             </div>
             
-            <div className="flex items-center gap-2 text-muted-foreground mt-1">
-              <User className="h-4 w-4" />
-              <CardDescription className="text-sm">{task.assignee}</CardDescription>
+            {highlightWeekday && currentAssignee && (
+              <div className="flex items-center gap-2 mt-1">
+                <User className="h-4 w-4 text-primary" />
+                <CardDescription className="text-sm font-medium text-primary">
+                  Responsável hoje: {currentAssignee}
+                </CardDescription>
+              </div>
+            )}
+            
+            <div className="flex items-center gap-2 mt-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardDescription className="text-sm">
+                Rotação: {task.assignees.join(' → ')}
+              </CardDescription>
             </div>
             
             {task.description && (
@@ -108,7 +123,7 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
                   highlightWeekday === weekday ? 'ring-2 ring-offset-2' : ''
                 }`}
               >
-                {getWeekdayLabel(weekday)}
+                {getWeekdayLabel(weekday)}: {getAssigneeForWeekday(task, weekday)}
               </Badge>
             ))}
           </CardFooter>
