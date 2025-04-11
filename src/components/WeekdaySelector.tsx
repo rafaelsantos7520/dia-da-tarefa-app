@@ -2,6 +2,7 @@
 import React from 'react';
 import { Weekday, weekdayOptions } from '@/types/task';
 import { cn } from '@/lib/utils';
+import { Badge } from "@/components/ui/badge";
 
 interface WeekdaySelectorProps {
   selectedWeekdays: Weekday[];
@@ -26,17 +27,17 @@ const WeekdaySelector = ({
     <div className={cn("flex flex-wrap gap-2", className)}>
       {weekdayOptions.map((weekday) => {
         const isSelected = selectedWeekdays.includes(weekday.value);
+        
         return (
           <button
             key={weekday.value}
             type="button"
             onClick={() => toggleWeekday(weekday.value)}
             className={cn(
-              "weekday-badge",
-              `text-${weekday.color}`,
+              "h-8 w-8 rounded-full text-sm font-medium transition-colors",
               isSelected 
-                ? `bg-${weekday.color} text-white ring-2 ring-${weekday.color}/30` 
-                : `bg-${weekday.color}/10 border border-${weekday.color}/20`
+                ? `bg-${weekday.color} text-white border-2 border-${weekday.color} shadow-sm` 
+                : `bg-${weekday.color}/20 text-${weekday.color} border border-${weekday.color}/30 hover:bg-${weekday.color}/30`
             )}
             title={weekday.label}
           >

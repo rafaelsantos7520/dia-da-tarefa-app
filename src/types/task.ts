@@ -1,13 +1,16 @@
-
 export type Weekday = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export type TaskStatus = 'pending' | 'completed' | 'skipped';
 
 export interface Task {
   id: string;
   title: string;
   description: string;
-  assignees: string[]; // Changed from single assignee to array of assignees
+  assignees: string[]; 
   weekdays: Weekday[];
   createdAt: string;
+  currentAssigneeIndex: number; // Índice atual na rotação
+  lastCompletionDate?: string; // Data da última conclusão
+  status: Record<string, TaskStatus>; // Status indexado por data (YYYY-MM-DD)
 }
 
 export const weekdayOptions: { value: Weekday; label: string; color: string }[] = [
@@ -30,11 +33,36 @@ export const getWeekdayLabel = (weekday: Weekday): string => {
   return option ? option.label : weekday;
 };
 
-// Helper to get which person is responsible for a task on a given weekday
+export const getCurrentWeekday = (): Weekday => {
+  const days: Weekday[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const today = new Date().getDay();
+  return days[today];
+};
+
+export const formatDateKey = (date: Date = new Date()): string => {
+  return date.toISOString().split('T')[0];
+};
+
+export const isSameDay = (date1: Date, date2: Date): boolean => {
+  return formatDateKey(date1) === formatDateKey(date2);
+};
+
 export const getAssigneeForWeekday = (task: Task, weekday: Weekday): string => {
-  const weekdayIndex = task.weekdays.indexOf(weekday);
-  if (weekdayIndex === -1) return '';
+  if (!task.weekdays.includes(weekday) || task.assignees.length === 0) {
+    return '';
+  }
   
-  // Rotate through assignees based on the weekday's position
-  return task.assignees[weekdayIndex % task.assignees.length];
+  const todayKey = formatDateKey();
+  const assigneeIndex = task.currentAssigneeIndex % task.assignees.length;
+  return task.assignees[assigneeIndex];
+};
+
+export const getNextAssigneeIndex = (task: Task): number => {
+  if (task.assignees.length <= 1) return 0;
+  return (task.currentAssigneeIndex + 1) % task.assignees.length;
+};
+
+export const getTaskStatusForToday = (task: Task): TaskStatus => {
+  const today = formatDateKey();
+  return task.status[today] || 'pending';
 };

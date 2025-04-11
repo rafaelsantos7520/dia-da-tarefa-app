@@ -11,6 +11,7 @@ import { CalendarDays, PlusCircle, X, Users, Plus, UserPlus } from 'lucide-react
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -38,6 +39,12 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
   const handleAddAssignee = () => {
     if (!currentAssignee.trim()) {
       toast.error('Digite o nome do responsável');
+      return;
+    }
+    
+    // Verificar se já existe esse responsável
+    if (assignees.includes(currentAssignee.trim())) {
+      toast.error('Este responsável já foi adicionado');
       return;
     }
     
@@ -75,7 +82,13 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
     };
 
     if (editTask) {
-      updateTask({ ...taskData, id: editTask.id, createdAt: editTask.createdAt });
+      updateTask({
+        ...taskData, 
+        id: editTask.id, 
+        createdAt: editTask.createdAt,
+        currentAssigneeIndex: editTask.currentAssigneeIndex || 0,
+        status: editTask.status || {}
+      });
     } else {
       addTask(taskData);
     }
@@ -95,6 +108,7 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
     }
   };
 
+  // Resto do código permanece igual
   const formContent = (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -214,6 +228,9 @@ const TaskForm = ({ editTask, onClose, triggerButton }: TaskFormProps) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Nova Tarefa</DialogTitle>
+          <DialogDescription>
+            Adicione uma nova tarefa rotativa para o seu grupo.
+          </DialogDescription>
         </DialogHeader>
         {formContent}
       </DialogContent>

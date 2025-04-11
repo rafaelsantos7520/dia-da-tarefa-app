@@ -1,6 +1,14 @@
 
 import React, { useState } from 'react';
-import { Task, Weekday, getWeekdayLabel, getWeekdayColor, getAssigneeForWeekday } from '@/types/task';
+import { 
+  Task, 
+  Weekday, 
+  getWeekdayLabel, 
+  getWeekdayColor, 
+  getAssigneeForWeekday, 
+  formatDateKey,
+  getTaskStatusForToday
+} from '@/types/task';
 import { useTaskContext } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
 import { 
@@ -24,7 +32,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Edit, Trash2, User, Users, Calendar } from 'lucide-react';
+import { 
+  Edit, 
+  Trash2, 
+  User, 
+  Users, 
+  Calendar, 
+  CheckCircle, 
+  XCircle, 
+  RotateCcw 
+} from 'lucide-react';
+import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface TaskCardProps {
   task: Task;
@@ -32,12 +51,90 @@ interface TaskCardProps {
 }
 
 const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
-  const { deleteTask } = useTaskContext();
+  const { deleteTask, completeTask, skipTask, resetTaskStatus } = useTaskContext();
   const [isEditing, setIsEditing] = useState(false);
 
-  // Get the current weekday's assignee
+  // Determina o status da tarefa para hoje
+  const today = formatDateKey();
+  const taskStatus = task.status[today] || 'pending';
+  
+  // Determina o responsável atual
   const currentAssignee = highlightWeekday ? 
     getAssigneeForWeekday(task, highlightWeekday as Weekday) : '';
+
+  const renderStatusActions = () => {
+    if (!highlightWeekday) return null;
+
+    switch (taskStatus) {
+      case 'completed':
+        return (
+          <div className="flex items-center mt-2 p-2 bg-green-500/10 rounded-md">
+            <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+            <p className="text-sm">Concluída hoje</p>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => resetTaskStatus(task.id)}
+              className="ml-auto h-8 w-8"
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <RotateCcw className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Resetar status</p>
+                </TooltipContent>
+              </Tooltip>
+            </Button>
+          </div>
+        );
+      
+      case 'skipped':
+        return (
+          <div className="flex items-center mt-2 p-2 bg-amber-500/10 rounded-md">
+            <XCircle className="h-5 w-5 text-amber-500 mr-2" />
+            <p className="text-sm">Tarefa pulada hoje</p>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => resetTaskStatus(task.id)}
+              className="ml-auto h-8 w-8"
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <RotateCcw className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Resetar status</p>
+                </TooltipContent>
+              </Tooltip>
+            </Button>
+          </div>
+        );
+      
+      default:
+        return (
+          <div className="flex items-center gap-2 mt-2 pt-2 border-t">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex-1 text-xs border-green-500/20 text-green-500 hover:bg-green-500/10 hover:text-green-600"
+              onClick={() => completeTask(task.id)}
+            >
+              <CheckCircle className="h-4 w-4 mr-1" /> Concluída
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex-1 text-xs border-amber-500/20 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600"
+              onClick={() => skipTask(task.id)}
+            >
+              <XCircle className="h-4 w-4 mr-1" /> Pulada
+            </Button>
+          </div>
+        );
+    }
+  };
 
   return (
     <Card className="w-full h-full flex flex-col">
@@ -113,12 +210,16 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
             {task.description && (
               <CardDescription className="text-sm mt-2 line-clamp-2">{task.description}</CardDescription>
             )}
+            
+            {/* Novo: ações de status */}
+            {highlightWeekday === getCurrentWeekday() && renderStatusActions()}
           </CardHeader>
           
           <CardFooter className="flex flex-wrap gap-1.5 mt-auto pt-3">
             {task.weekdays.map((weekday) => {
               const colorClass = getWeekdayColor(weekday);
               const isHighlighted = highlightWeekday === weekday;
+              const assignee = getAssigneeForWeekday(task, weekday);
               
               return (
                 <Badge 
@@ -127,7 +228,7 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
                     isHighlighted ? 'ring-2 ring-offset-2' : ''
                   }`}
                 >
-                  {getWeekdayLabel(weekday)}: {getAssigneeForWeekday(task, weekday)}
+                  {getWeekdayLabel(weekday)}: {assignee}
                 </Badge>
               );
             })}
