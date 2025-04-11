@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Task, Weekday, TaskStatus, formatDateKey, getCurrentWeekday, getNextAssigneeIndex } from '@/types/task';
 import { toast } from 'sonner';
@@ -12,6 +11,7 @@ type TaskContextType = {
   completeTask: (taskId: string) => void;
   skipTask: (taskId: string) => void;
   resetTaskStatus: (taskId: string) => void;
+  markParticipantAbsent: (taskId: string) => void;
 };
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -73,18 +73,14 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     return tasks.filter((task) => task.weekdays.includes(weekday));
   };
 
-  // Nova função para marcar uma tarefa como concluída
   const completeTask = (taskId: string) => {
     setTasks((prev) => 
       prev.map((task) => {
         if (task.id !== taskId) return task;
 
-        // Criar cópia do status atual
         const today = formatDateKey();
         const newStatus = { ...task.status, [today]: 'completed' as TaskStatus };
         
-        // Atualizar o índice do próximo responsável (rotação)
-        // Só avançamos o índice se a tarefa foi concluída
         const nextIndex = getNextAssigneeIndex(task);
         
         return {
@@ -98,14 +94,12 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     toast.success('Tarefa marcada como concluída!');
   };
 
-  // Nova função para marcar uma tarefa como pulada (não concluída)
   const skipTask = (taskId: string) => {
     setTasks((prev) => 
       prev.map((task) => {
         if (task.id !== taskId) return task;
         
         const today = formatDateKey();
-        // Marcar como pulada, mas não avançar a rotação
         const newStatus = { ...task.status, [today]: 'skipped' as TaskStatus };
         
         return {
@@ -117,7 +111,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     toast.info('Tarefa marcada como pulada para hoje.');
   };
 
-  // Nova função para resetar o status da tarefa de hoje
   const resetTaskStatus = (taskId: string) => {
     setTasks((prev) => 
       prev.map((task) => {
@@ -125,7 +118,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         
         const today = formatDateKey();
         const newStatus = { ...task.status };
-        delete newStatus[today]; // Remove o status de hoje
+        delete newStatus[today];
         
         return {
           ...task,
@@ -134,6 +127,27 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
       })
     );
     toast.info('Status da tarefa resetado para hoje.');
+  };
+
+  const markParticipantAbsent = (taskId: string) => {
+    setTasks((prev) => 
+      prev.map((task) => {
+        if (task.id !== taskId) return task;
+        
+        const today = formatDateKey();
+        const nextIndex = getNextAssigneeIndex(task);
+        
+        const newStatus = { ...task.status, [today]: 'skipped' as TaskStatus };
+        
+        toast.info('Participante ausente. Responsabilidade transferida para o próximo da rotação.');
+        
+        return {
+          ...task,
+          status: newStatus,
+          currentAssigneeIndex: nextIndex,
+        };
+      })
+    );
   };
 
   return (
@@ -146,7 +160,8 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
         getTasksByWeekday,
         completeTask,
         skipTask,
-        resetTaskStatus
+        resetTaskStatus,
+        markParticipantAbsent
       }}
     >
       {children}

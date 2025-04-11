@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Task, 
@@ -41,7 +40,8 @@ import {
   Calendar, 
   CheckCircle, 
   XCircle, 
-  RotateCcw 
+  RotateCcw,
+  UserX 
 } from 'lucide-react';
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -52,7 +52,7 @@ interface TaskCardProps {
 }
 
 const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
-  const { deleteTask, completeTask, skipTask, resetTaskStatus } = useTaskContext();
+  const { deleteTask, completeTask, skipTask, resetTaskStatus, markParticipantAbsent } = useTaskContext();
   const [isEditing, setIsEditing] = useState(false);
 
   // Determina o status da tarefa para hoje
@@ -115,22 +115,32 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
       
       default:
         return (
-          <div className="flex items-center gap-2 mt-2 pt-2 border-t">
+          <div className="flex flex-col gap-2 mt-2 pt-2 border-t">
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-1 text-xs border-green-500/20 text-green-500 hover:bg-green-500/10 hover:text-green-600"
+                onClick={() => completeTask(task.id)}
+              >
+                <CheckCircle className="h-4 w-4 mr-1" /> Concluída
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex-1 text-xs border-amber-500/20 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600"
+                onClick={() => skipTask(task.id)}
+              >
+                <XCircle className="h-4 w-4 mr-1" /> Pulada
+              </Button>
+            </div>
             <Button 
               variant="outline" 
               size="sm"
-              className="flex-1 text-xs border-green-500/20 text-green-500 hover:bg-green-500/10 hover:text-green-600"
-              onClick={() => completeTask(task.id)}
+              className="text-xs border-red-500/20 text-red-500 hover:bg-red-500/10 hover:text-red-600"
+              onClick={() => markParticipantAbsent(task.id)}
             >
-              <CheckCircle className="h-4 w-4 mr-1" /> Concluída
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="flex-1 text-xs border-amber-500/20 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600"
-              onClick={() => skipTask(task.id)}
-            >
-              <XCircle className="h-4 w-4 mr-1" /> Pulada
+              <UserX className="h-4 w-4 mr-1" /> Participante Ausente
             </Button>
           </div>
         );
@@ -212,7 +222,6 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
               <CardDescription className="text-sm mt-2 line-clamp-2">{task.description}</CardDescription>
             )}
             
-            {/* Novo: ações de status */}
             {highlightWeekday === getCurrentWeekday() && renderStatusActions()}
           </CardHeader>
           
