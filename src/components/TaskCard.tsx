@@ -7,7 +7,8 @@ import {
   getWeekdayColor, 
   getAssigneeForWeekday, 
   formatDateKey,
-  getTaskStatusForToday
+  getTaskStatusForToday,
+  getCurrentWeekday
 } from '@/types/task';
 import { useTaskContext } from '@/context/TaskContext';
 import { Button } from '@/components/ui/button';
