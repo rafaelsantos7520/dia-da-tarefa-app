@@ -37,13 +37,13 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222.2 47.4% 11.2%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 47.4% 13.2%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 47.4% 11.2%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 210 100% 50%;
@@ -78,9 +78,45 @@
 }
 
 .weekday-badge {
-  @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium transition-colors;
+  @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium transition-colors shadow-sm;
 }
 
 .weekday-badge.selected {
   @apply text-white scale-110;
 }
+
+/* Task colors for direct use with Tailwind classes */
+.bg-task-blue { @apply bg-blue-500; }
+.bg-task-green { @apply bg-green-500; }
+.bg-task-yellow { @apply bg-yellow-500; }
+.bg-task-red { @apply bg-red-500; }
+.bg-task-purple { @apply bg-purple-500; }
+.bg-task-indigo { @apply bg-indigo-500; }
+
+.text-task-blue { @apply text-blue-500; }
+.text-task-green { @apply text-green-500; }
+.text-task-yellow { @apply text-yellow-500; }
+.text-task-red { @apply text-red-500; }
+.text-task-purple { @apply text-purple-500; }
+.text-task-indigo { @apply text-indigo-500; }
+
+.bg-task-blue\/10 { @apply bg-blue-500/10; }
+.bg-task-green\/10 { @apply bg-green-500/10; }
+.bg-task-yellow\/10 { @apply bg-yellow-500/10; }
+.bg-task-red\/10 { @apply bg-red-500/10; }
+.bg-task-purple\/10 { @apply bg-purple-500/10; }
+.bg-task-indigo\/10 { @apply bg-indigo-500/10; }
+
+.ring-task-blue\/30 { @apply ring-blue-500/30; }
+.ring-task-green\/30 { @apply ring-green-500/30; }
+.ring-task-yellow\/30 { @apply ring-yellow-500/30; }
+.ring-task-red\/30 { @apply ring-red-500/30; }
+.ring-task-purple\/30 { @apply ring-purple-500/30; }
+.ring-task-indigo\/30 { @apply ring-indigo-500/30; }
+
+.border-task-blue\/20 { @apply border-blue-500/20; }
+.border-task-green\/20 { @apply border-green-500/20; }
+.border-task-yellow\/20 { @apply border-yellow-500/20; }
+.border-task-red\/20 { @apply border-red-500/20; }
+.border-task-purple\/20 { @apply border-purple-500/20; }
+.border-task-indigo\/20 { @apply border-indigo-500/20; }

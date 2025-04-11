@@ -5,9 +5,11 @@ import { weekdayOptions, Weekday } from '@/types/task';
 import TaskCard from './TaskCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarDays } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const TaskList = () => {
   const { tasks, getTasksByWeekday } = useTaskContext();
+  const isMobile = useIsMobile();
   
   // Get the current day of the week as default tab
   const getCurrentDayIndex = () => {
@@ -32,17 +34,19 @@ const TaskList = () => {
 
   return (
     <Tabs defaultValue={defaultTab} className="w-full">
-      <TabsList className="mb-4 flex w-full overflow-x-auto pb-px">
-        {weekdayOptions.map((day) => (
-          <TabsTrigger 
-            key={day.value} 
-            value={day.value}
-            className="flex-1"
-          >
-            {day.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="mb-4 overflow-x-auto pb-1">
+        <TabsList className="h-auto inline-flex min-w-full">
+          {weekdayOptions.map((day) => (
+            <TabsTrigger 
+              key={day.value} 
+              value={day.value}
+              className={`flex-1 px-2.5 py-1.5 ${isMobile ? 'text-xs' : ''}`}
+            >
+              {isMobile ? day.label.substring(0, 3) : day.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
       
       {weekdayOptions.map((day) => {
         const weekdayTasks = getTasksByWeekday(day.value);
@@ -60,7 +64,7 @@ const TaskList = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {weekdayTasks.map((task) => (
                   <TaskCard 
                     key={task.id} 

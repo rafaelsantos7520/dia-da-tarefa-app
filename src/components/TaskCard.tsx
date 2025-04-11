@@ -40,9 +40,9 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
     getAssigneeForWeekday(task, highlightWeekday as Weekday) : '';
 
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-full flex flex-col">
       {isEditing ? (
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 flex-grow">
           <TaskForm 
             editTask={task} 
             onClose={() => setIsEditing(false)} 
@@ -50,10 +50,10 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
         </CardContent>
       ) : (
         <>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <CardTitle className="text-lg">{task.title}</CardTitle>
-              <div className="flex gap-1">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start gap-2">
+              <CardTitle className="text-lg break-words">{task.title}</CardTitle>
+              <div className="flex gap-1 shrink-0">
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -111,21 +111,26 @@ const TaskCard = ({ task, highlightWeekday }: TaskCardProps) => {
             </div>
             
             {task.description && (
-              <CardDescription className="text-sm mt-2">{task.description}</CardDescription>
+              <CardDescription className="text-sm mt-2 line-clamp-2">{task.description}</CardDescription>
             )}
           </CardHeader>
           
-          <CardFooter className="flex flex-wrap gap-1.5">
-            {task.weekdays.map((weekday) => (
-              <Badge 
-                key={weekday} 
-                className={`bg-${getWeekdayColor(weekday)} hover:bg-${getWeekdayColor(weekday)}/90 ${
-                  highlightWeekday === weekday ? 'ring-2 ring-offset-2' : ''
-                }`}
-              >
-                {getWeekdayLabel(weekday)}: {getAssigneeForWeekday(task, weekday)}
-              </Badge>
-            ))}
+          <CardFooter className="flex flex-wrap gap-1.5 mt-auto pt-3">
+            {task.weekdays.map((weekday) => {
+              const colorClass = getWeekdayColor(weekday);
+              const isHighlighted = highlightWeekday === weekday;
+              
+              return (
+                <Badge 
+                  key={weekday} 
+                  className={`bg-${colorClass} hover:bg-${colorClass}/90 whitespace-nowrap ${
+                    isHighlighted ? 'ring-2 ring-offset-2' : ''
+                  }`}
+                >
+                  {getWeekdayLabel(weekday)}: {getAssigneeForWeekday(task, weekday)}
+                </Badge>
+              );
+            })}
           </CardFooter>
         </>
       )}

@@ -33,8 +33,10 @@ const WeekdaySelector = ({
             onClick={() => toggleWeekday(weekday.value)}
             className={cn(
               "weekday-badge",
-              `bg-${weekday.color}/10 hover:bg-${weekday.color}/20`,
-              isSelected && `selected bg-${weekday.color} hover:bg-${weekday.color}`
+              `text-${weekday.color}`,
+              isSelected 
+                ? `bg-${weekday.color} text-white ring-2 ring-${weekday.color}/30` 
+                : `bg-${weekday.color}/10 border border-${weekday.color}/20`
             )}
             title={weekday.label}
           >
