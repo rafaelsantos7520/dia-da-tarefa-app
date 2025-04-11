@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Task, Weekday } from '@/types/task';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 type TaskContextType = {
   tasks: Task[];

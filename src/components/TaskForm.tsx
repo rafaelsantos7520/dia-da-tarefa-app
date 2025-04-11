@@ -6,7 +6,7 @@ import WeekdaySelector from './WeekdaySelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import { CalendarDays, PlusCircle, X } from 'lucide-react';
 import {
   Dialog,
